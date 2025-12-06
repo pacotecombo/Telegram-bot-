@@ -1,0 +1,1 @@
+worker: python assinaturas_manual_telegram_bot.py
