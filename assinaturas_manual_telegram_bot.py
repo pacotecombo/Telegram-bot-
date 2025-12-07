@@ -467,27 +467,24 @@ async def meu_plano(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ===== MAIN =====
 def main():
     application = Application.builder().token(TOKEN).build()
-    
-    # Job para verificar expirados a cada hora
-    job_queue = application.job_queue
-    job_queue.run_repeating(verificar_expirados, interval=3600, first=10)
-    
-    # Handlers
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("adm", adm))
     application.add_handler(CommandHandler("meuplano", meu_plano))
     application.add_handler(CommandHandler("lista_ativos", lista_ativos))
     application.add_handler(CommandHandler("lista_vencendo", lista_vencendo))
-    
+
     application.add_handler(CallbackQueryHandler(callback_planos, pattern="^plano_"))
     application.add_handler(CallbackQueryHandler(gerar_pix, pattern="^gerar_pix$"))
     application.add_handler(CallbackQueryHandler(mostrar_codigo_pix, pattern="^mostrar_codigo_pix$"))
     application.add_handler(CallbackQueryHandler(confirmar_pagamento, pattern="^confirmar_pagamento$"))
     application.add_handler(CallbackQueryHandler(processar_acesso, pattern="^(liberar|negar)_"))
     application.add_handler(CallbackQueryHandler(processar_vencimento, pattern="^(manter|banir)_"))
-    
+
     application.add_handler(MessageHandler(filters.PHOTO | filters.Document.ALL, receber_comprovante))
-    
+
+    application.job_queue.run_repeating(verificar_expirados, interval=3600, first=10)
+
     print("✧ 𝑩𝒐𝒕 𝒊𝒏𝒊𝒄𝒊𝒂𝒅𝒐 ✧")
     application.run_polling()
 
