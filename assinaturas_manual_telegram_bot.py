@@ -33,7 +33,13 @@ def salvar_usuarios(usuarios):
 
 usuarios = carregar_usuarios()
 
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Ignora mensagens de grupos
+    if update.effective_chat.type != "private":
+        return
+    
     user = update.effective_user
     if str(user.id) not in usuarios:
         usuarios[str(user.id)] = {
@@ -72,6 +78,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup,
         parse_mode='Markdown'
     )
+
 
 async def callback_planos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
