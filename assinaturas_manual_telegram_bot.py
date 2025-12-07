@@ -12,7 +12,6 @@ GROUP_ID = -1003395458966
 PHOTO_URL = "https://i.postimg.cc/2jwbdQ1Z/by-PKOFs-(Telegram)-(263)-2.jpg"
 PIX_IMAGE_URL = "https://i.postimg.cc/GpqJSW2q/IMG-20251206-173813-644.jpg"
 
-# Códigos PIX para cada plano
 PIX_CODES = {
     "semanal": "00020126580014BR.GOV.BCB.PIX0136ee76cc9d-7542-478a-ba8b-31840b87595e520400005303986540514.905802BR5901N6001C62180514ASSINATURASVIP63049ABF",
     "mensal": "00020126580014BR.GOV.BCB.PIX0136ee76cc9d-7542-478a-ba8b-31840b87595e520400005303986540529.905802BR5901N6001C62180514ASSINATURASVIP6304E08A",
@@ -22,7 +21,6 @@ PIX_CODES = {
 
 USERS_FILE = "usuarios.json"
 
-# ===== FUNÇÕES AUXILIARES =====
 def carregar_usuarios():
     if os.path.exists(USERS_FILE):
         with open(USERS_FILE, 'r', encoding='utf-8') as f:
@@ -35,27 +33,6 @@ def salvar_usuarios(usuarios):
 
 usuarios = carregar_usuarios()
 
-# ===== VERIFICAR EXPIRADOS =====
-async def verificar_expirados(context: ContextTypes.DEFAULT_TYPE):
-    agora = datetime.now()
-    for user_id, dados in list(usuarios.items()):
-        if not dados.get("ativo") or dados.get("plano") == "Vitalício":
-            continue
-        expira_em = datetime.strptime(dados["expira_em"], "%Y-%m-%d %H:%M:%S")
-        if expira_em <= agora:
-            usuarios[user_id]["ativo"] = False
-            salvar_usuarios(usuarios)
-            try:
-                await context.bot.ban_chat_member(chat_id=GROUP_ID, user_id=int(user_id))
-                await context.bot.send_message(
-                    chat_id=int(user_id),
-                    text="✧ 𝑺𝒖𝒂 𝑨𝒔𝒔𝒊𝒏𝒂𝒕𝒖𝒓𝒂 𝑬𝒙𝒑𝒊𝒓𝒐𝒖 ✧\n\n𝑺𝒆𝒖 𝒂𝒄𝒆𝒔𝒔𝒐 𝒇𝒐𝒊 𝒆𝒏𝒄𝒆𝒓𝒓𝒂𝒅𝒐.\n\n𝑼𝒔𝒆 /start 𝒑𝒂𝒓𝒂 𝒓𝒆𝒏𝒐𝒗𝒂𝒓!",
-                    parse_mode='Markdown'
-                )
-            except Exception as e:
-                print(f"Erro ao banir {user_id}: {e}")
-
-# ===== COMANDO /START =====
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     if str(user.id) not in usuarios:
@@ -96,7 +73,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
 
-# ===== CALLBACK DOS PLANOS =====
 async def callback_planos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -122,7 +98,7 @@ async def callback_planos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("𝑷𝑰𝑿", callback_data="gerar_pix")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_caption(caption=mensagem, reply_markup=reply_markup, parse_mode='Markdown')
-# ===== GERAR PIX =====
+
 async def gerar_pix(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer("𝑮𝒆𝒓𝒂𝒏𝒅𝒐 𝑷𝒂𝒈𝒂𝒎𝒆𝒏𝒕𝒐...")
@@ -154,7 +130,6 @@ async def gerar_pix(update: Update, context: ContextTypes.DEFAULT_TYPE):
         parse_mode='Markdown'
     )
 
-# ===== MOSTRAR CÓDIGO PIX =====
 async def mostrar_codigo_pix(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -178,7 +153,6 @@ async def mostrar_codigo_pix(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     await query.edit_message_caption(caption=mensagem, reply_markup=reply_markup, parse_mode='Markdown')
 
-# ===== CONFIRMAR PAGAMENTO =====
 async def confirmar_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -188,7 +162,6 @@ async def confirmar_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE
         parse_mode='Markdown'
     )
 
-# ===== RECEBER COMPROVANTE =====
 async def receber_comprovante(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     user_id = str(user.id)
@@ -237,7 +210,6 @@ async def receber_comprovante(update: Update, context: ContextTypes.DEFAULT_TYPE
             parse_mode='Markdown'
         )
 
-# ===== LIBERAR/NEGAR ACESSO =====
 async def processar_acesso(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -301,7 +273,7 @@ async def processar_acesso(update: Update, context: ContextTypes.DEFAULT_TYPE):
             caption=f"{query.message.caption}\n\n✧ 𝑨𝒄𝒆𝒔𝒔𝒐 𝑵𝒆𝒈𝒂𝒅𝒐 ✧",
             parse_mode='Markdown'
         )
-# ===== COMANDO /ADM =====
+
 async def adm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         await update.message.reply_text("𝑽𝒐𝒄𝒆̂ 𝒏𝒂̃𝒐 𝒕𝒆𝒎 𝒑𝒆𝒓𝒎𝒊𝒔𝒔𝒂̃𝒐!")
@@ -334,7 +306,6 @@ async def adm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(mensagem, parse_mode='Markdown')
 
-# ===== LISTAR USUÁRIOS ATIVOS =====
 async def lista_ativos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
@@ -347,7 +318,7 @@ async def lista_ativos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     mensagem = "✧ 𝑼𝒔𝒖𝒂́𝒓𝒊𝒐𝒔 𝑨𝒕𝒊𝒗𝒐𝒔 ✧\n\n"
     
-    for uid, dados in ativos[:20]:  # Limita a 20 para não exceder limite
+    for uid, dados in ativos[:20]:
         expira = datetime.strptime(dados["expira_em"], "%Y-%m-%d %H:%M:%S")
         dias_restantes = (expira - datetime.now()).days
         
@@ -359,7 +330,6 @@ async def lista_ativos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(mensagem, parse_mode='Markdown')
 
-# ===== LISTAR VENCENDO =====
 async def lista_vencendo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_user.id != ADMIN_ID:
         return
@@ -402,7 +372,6 @@ async def lista_vencendo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         await update.message.reply_text(msg, reply_markup=reply_markup, parse_mode='Markdown')
 
-# ===== MANTER/BANIR USUÁRIO =====
 async def processar_vencimento(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -439,7 +408,6 @@ async def processar_vencimento(update: Update, context: ContextTypes.DEFAULT_TYP
         except Exception as e:
             await query.edit_message_text(f"{query.message.text}\n\n𝑬𝒓𝒓𝒐: {str(e)}", parse_mode='Markdown')
 
-# ===== COMANDO /MEUPLANO =====
 async def meu_plano(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = str(update.effective_user.id)
     
@@ -464,27 +432,24 @@ async def meu_plano(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text(mensagem, parse_mode='Markdown')
 
-# ===== MAIN =====
 def main():
     application = Application.builder().token(TOKEN).build()
-
+    
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("adm", adm))
     application.add_handler(CommandHandler("meuplano", meu_plano))
     application.add_handler(CommandHandler("lista_ativos", lista_ativos))
     application.add_handler(CommandHandler("lista_vencendo", lista_vencendo))
-
+    
     application.add_handler(CallbackQueryHandler(callback_planos, pattern="^plano_"))
     application.add_handler(CallbackQueryHandler(gerar_pix, pattern="^gerar_pix$"))
     application.add_handler(CallbackQueryHandler(mostrar_codigo_pix, pattern="^mostrar_codigo_pix$"))
     application.add_handler(CallbackQueryHandler(confirmar_pagamento, pattern="^confirmar_pagamento$"))
     application.add_handler(CallbackQueryHandler(processar_acesso, pattern="^(liberar|negar)_"))
     application.add_handler(CallbackQueryHandler(processar_vencimento, pattern="^(manter|banir)_"))
-
+    
     application.add_handler(MessageHandler(filters.PHOTO | filters.Document.ALL, receber_comprovante))
-
-    application.job_queue.run_repeating(verificar_expirados, interval=3600, first=10)
-
+    
     print("✧ 𝑩𝒐𝒕 𝒊𝒏𝒊𝒄𝒊𝒂𝒅𝒐 ✧")
     application.run_polling()
 
